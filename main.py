@@ -7,8 +7,8 @@ from playwright.sync_api import sync_playwright
 from tabulate import tabulate
 
 # 获取以逗号分隔的多个用户名和密码
-USERNAMES = os.environ.get("USERNAMES").split(",")
-PASSWORDS = os.environ.get("PASSWORDS").split(",")
+USERNAME = os.environ.get("USERNAME").split(",")
+PASSWORD = os.environ.get("PASSWORD").split(",")
 
 HOME_URL = "https://linux.do/"
 
@@ -51,7 +51,7 @@ class LinuxDoBrowser:
             page.close()
 
     def run(self):
-        for username, password in zip(USERNAMES, PASSWORDS):
+        for username, password in zip(USERNAME, PASSWORD):
             if not self.login(username, password):
                 continue
             self.click_topic()
@@ -84,10 +84,10 @@ class LinuxDoBrowser:
         page.close()
 
 if __name__ == "__main__":
-    if len(USERNAMES) == 0 or len(PASSWORDS) == 0:
-        print("请设置 USERNAMES 和 PASSWORDS")
+    if len(USERNAME) == 0 or len(PASSWORD) == 0:
+        print("请设置 USERNAME 和 PASSWORD")
         exit(1)
-    if len(USERNAMES) != len(PASSWORDS):
+    if len(USERNAME) != len(PASSWORD):
         print("用户和密码的数量不匹配")
         exit(1)
     l = LinuxDoBrowser()
