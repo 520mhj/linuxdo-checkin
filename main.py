@@ -7,8 +7,8 @@ from playwright.sync_api import sync_playwright
 from tabulate import tabulate
 
 # 获取以逗号分隔的多个用户名和密码
-USERNAMES = os.environ.get("USERNAMES").split(",")
-PASSWORDS = os.environ.get("PASSWORDS").split(",")
+USERNAMES = os.environ.get("USERNAME").split(",")
+PASSWORDS = os.environ.get("PASSWORD").split(",")
 
 HOME_URL = "https://linux.do/"
 
