@@ -20,20 +20,24 @@ class LinuxDoBrowser:
 
     def login(self, username, password):
         logger.info(f"尝试登录用户: {username}")
-        self.page = self.context.new_page()
+        self.page = self.context.new_page()  # 每次登录都创建新页面
         self.page.goto(HOME_URL)
-        self.page.click(".login-button .d-button-label")
-        time.sleep(2)
-        self.page.fill("#login-account-name", username)
-        time.sleep(2)
-        self.page.fill("#login-account-password", password)
-        time.sleep(2)
-        self.page.click("#login-button")
-        time.sleep(10)
         
+        # 等待登录按钮并点击
+        self.page.wait_for_selector(".login-button .d-button-label", timeout=60000)  # 等待60秒
+        self.page.click(".login-button .d-button-label")
+        
+        self.page.fill("#login-account-name", username)
+        self.page.fill("#login-account-password", password)
+        self.page.click("#login-button")
+        
+        # 等待用户元素加载以验证是否登录成功
+        self.page.wait_for_selector("#current-user", timeout=60000)  # 等待60秒
         user_ele = self.page.query_selector("#current-user")
+        
         if not user_ele:
             logger.error(f"{username} 登录失败")
+            self.page.close()  # 关闭页面
             return False
         else:
             logger.info(f"{username} 登录成功")
