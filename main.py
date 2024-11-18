@@ -23,25 +23,34 @@ class LinuxDoBrowser:
         self.page = self.context.new_page()  # 每次登录都创建新页面
         self.page.goto(HOME_URL)
         
-        # 等待登录按钮并点击
-        self.page.wait_for_selector(".login-button .d-button-label", timeout=60000)  # 等待60秒
-        self.page.click(".login-button .d-button-label")
+        # 使用动态等待，以确保页面状态正确
+        try:
+            self.page.wait_for_selector(".login-button .d-button-label", timeout=60000)  # 等待60秒
+            self.page.click(".login-button .d-button-label")
+        except Exception as e:
+            logger.error(f"等待登录按钮失败: {e}")
+            self.page.close()  # 确保页面被关闭
+            return False
         
         self.page.fill("#login-account-name", username)
         self.page.fill("#login-account-password", password)
         self.page.click("#login-button")
-        
+
         # 等待用户元素加载以验证是否登录成功
-        self.page.wait_for_selector("#current-user", timeout=60000)  # 等待60秒
-        user_ele = self.page.query_selector("#current-user")
-        
-        if not user_ele:
-            logger.error(f"{username} 登录失败")
-            self.page.close()  # 关闭页面
+        try:
+            self.page.wait_for_selector("#current-user", timeout=60000)  # 等待60秒
+            user_ele = self.page.query_selector("#current-user")
+            if not user_ele:
+                logger.error(f"{username} 登录失败")
+                return False
+            else:
+                logger.info(f"{username} 登录成功")
+                return True
+        except Exception as e:
+            logger.error(f"登录失败: {e}")
             return False
-        else:
-            logger.info(f"{username} 登录成功")
-            return True
+        finally:
+            self.page.close()  # 不论成功与否，始终关闭页面以释放资源
 
     def click_topic(self):
         for topic in self.page.query_selector_all("#list-area .title"):
