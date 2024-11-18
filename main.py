@@ -20,13 +20,13 @@ class LinuxDoBrowser:
         self.page = self.context.new_page()
         self.page.goto(HOME_URL)
 
-    def login(self):
+    def login(self, username, password):
         logger.info("Login")
         self.page.click(".login-button .d-button-label")
         time.sleep(2)
-        self.page.fill("#login-account-name", USERNAME)
+        self.page.fill("#login-account-name", username)
         time.sleep(2)
-        self.page.fill("#login-account-password", PASSWORD)
+        self.page.fill("#login-account-password", password)
         time.sleep(2)
         self.page.click("#login-button")
         time.sleep(10)
@@ -51,7 +51,7 @@ class LinuxDoBrowser:
 
     def run(self):
         for username, password in zip(USERNAME, PASSWORD):
-            if not self.login():
+            if not self.login(username, password):
                 return
             self.click_topic()
             self.print_connect_info()
