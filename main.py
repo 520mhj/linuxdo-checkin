@@ -50,7 +50,7 @@ class LinuxDoBrowser:
             page.close()
 
     def run(self):
-        for username, password in zip(USERNAMES, PASSWORDS):
+        for username, password in zip(USERNAME, PASSWORD):
             if not self.login():
                 return
             self.click_topic()
