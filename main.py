@@ -22,7 +22,7 @@ class LinuxDoBrowser:
         logger.info(f"尝试登录用户: {username}")
         self.page = self.context.new_page()  # 每次登录都创建新页面
         self.page.goto(HOME_URL)
-        
+
         # 使用动态等待，以确保页面状态正确
         try:
             self.page.wait_for_selector(".login-button .d-button-label", timeout=60000)  # 等待60秒
@@ -31,7 +31,7 @@ class LinuxDoBrowser:
             logger.error(f"等待登录按钮失败: {e}")
             self.page.close()  # 确保页面被关闭
             return False
-        
+
         self.page.fill("#login-account-name", username)
         self.page.fill("#login-account-password", password)
         self.page.click("#login-button")
@@ -49,19 +49,26 @@ class LinuxDoBrowser:
         except Exception as e:
             logger.error(f"登录失败: {e}")
             return False
-        finally:
-            self.page.close()  # 不论成功与否，始终关闭页面以释放资源
 
     def click_topic(self):
-        for topic in self.page.query_selector_all("#list-area .title"):
+        # 创建一个新的页面来处理主题点击，以避免与登录页面冲突
+        topics_page = self.context.new_page()  
+        topics_page.goto(HOME_URL)  # 刷新页面以获取最新主题
+
+        # 使用动态等待确保主题列表已加载
+        topics_page.wait_for_selector("#list-area .title", timeout=60000)
+        
+        for topic in topics_page.query_selector_all("#list-area .title"):
             logger.info("点击主题: " + topic.get_attribute("href"))
-            page = self.context.new_page()
-            page.goto(HOME_URL + topic.get_attribute("href"))
+            topic_page = self.context.new_page()
+            topic_page.goto(HOME_URL + topic.get_attribute("href"))
             time.sleep(3)
-            if random.random() < 0.02:  # 100 * 0.02 * 30 = 60
-                self.click_like(page)
+            if random.random() < 0.02:  # 2% 的概率点赞
+                self.click_like(topic_page)
             time.sleep(3)
-            page.close()
+            topic_page.close()
+        
+        topics_page.close()  # 关闭主题页面以释放资源
 
     def run(self):
         for username, password in zip(USERNAME, PASSWORD):
