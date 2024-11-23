@@ -21,6 +21,8 @@ class LinuxDoBrowser:
         # 每次登录都创建新的页面
         self.page = self.context.new_page()
         self.page.goto(HOME_URL)
+        # 调试：打印页面的完整HTML
+        print(self.page.content())
 
         logger.info(f"尝试登录用户: {username}")
         
